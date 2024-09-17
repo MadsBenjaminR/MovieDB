@@ -31,6 +31,7 @@ public class Director {
         this.lastName = lastName;
         fullName = firstName + " "+ lastName;
         this.movie = movie;
+
     }
 
 }

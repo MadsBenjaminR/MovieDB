@@ -17,6 +17,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActorDTO {
 
+    @JsonProperty("id")
+    private Long id;
     @JsonProperty("name")
     private String name;
 

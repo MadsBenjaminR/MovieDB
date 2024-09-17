@@ -1,11 +1,14 @@
 package dat.entities;
 
 
+import dat.dtos.DirectorDTO;
+import dat.dtos.MovieDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**@author laith kaseb**/
@@ -29,8 +32,7 @@ public class Movie {
 
     private double runtime;
 
-    @ElementCollection
-    private Set<String> language;
+    private String language;
 
     private double budget;
     // TODO - fix remove og add metoder
@@ -42,6 +44,17 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private Set<Genre> genres = new HashSet<>();
+
+    public Movie(MovieDTO movieDTO) {
+        this.id = movieDTO.getId();
+        this.title = movieDTO.getTitle();
+        this.description = movieDTO.getDescription();
+        this.rating = movieDTO.getRating();
+        this.language = movieDTO.getLanguage();
+        this.budget = movieDTO.getBudget();
+
+    }
+
 
     public void addActor(Actor actor) {
        actor = new Actor(actor.getFirstName(), actor.getLastName(), actor.getMovie());

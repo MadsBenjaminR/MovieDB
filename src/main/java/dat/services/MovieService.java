@@ -2,6 +2,8 @@ package dat.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dat.dtos.MovieApiResponseDTO;
+import dat.dtos.MovieDTO;
 
 
 import java.io.IOException;
@@ -48,7 +50,7 @@ public class MovieService {
             if (response.statusCode() == 200) {
                 String jsonResponse = response.body();
                 MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
-                movies = apiResponse.getMovies();
+                movies = apiResponse.getMovie_results();
 
                 if (movies != null && !movies.isEmpty()) {
                     movies.forEach(movie -> System.out.println("Movie: " + movie));
@@ -131,7 +133,7 @@ public class MovieService {
                 if (response.statusCode() == 200) {
                     String jsonResponse = response.body();
                     MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
-                    movies = apiResponse.getMovies();
+                    movies = apiResponse.getMovie_results();
                     if (currentPage >= totalNumberOfPages) {
                         morePagesAvailable = false;
                     } else {
@@ -157,6 +159,7 @@ public class MovieService {
         return movies;
     }
 
+    /*
     public List<MovieDTO> getSortedByReleaseDate(String query) {
         try {
             // Construct the search query URL
@@ -181,7 +184,7 @@ public class MovieService {
                 MovieApiResponseDTO apiResponse = mapper.readValue(response.body(), MovieApiResponseDTO.class);
 
                 // Get the list of movies
-                List<MovieDTO> movies = apiResponse.getMovies();
+                List<MovieDTO> movies = apiResponse.getMovie_results();
 
                 // Sort movies by release date in descending order using Java Streams
                 return movies.stream()
@@ -201,6 +204,8 @@ public class MovieService {
         System.out.println("The method had returned an empty list");
         return List.of(); // Return an empty list if there's an error
     }
+
+     */
 
 }
 
