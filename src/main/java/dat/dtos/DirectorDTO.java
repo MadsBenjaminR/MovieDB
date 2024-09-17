@@ -16,10 +16,15 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DirectorDTO {
 
+    @JsonProperty("id")
+    private Long id;
     @JsonProperty("name")
     private String name;
 
     @JsonProperty("crew")
     private List<CrewDTO> crew;
 
+    public DirectorDTO(String name) {
+        this.name = name;
+    }
 }

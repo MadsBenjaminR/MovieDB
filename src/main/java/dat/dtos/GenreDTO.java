@@ -18,4 +18,6 @@ public class GenreDTO {
     private Long id;
     @JsonProperty("name")
     private String name;
+
+
 }
