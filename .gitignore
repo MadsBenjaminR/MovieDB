@@ -43,6 +43,10 @@
 .idea/modules
 *.iml
 *.ipr
+.idea/dataSources.xml
+.idea/vcs.xml
+.idea/encodings.xml
+
 
 # CMake
 cmake-build-*/
