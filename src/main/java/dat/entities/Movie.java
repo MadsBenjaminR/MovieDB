@@ -1,10 +1,12 @@
 package dat.entities;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
 
 /**@author laith kaseb**/
 @Getter
@@ -18,6 +20,7 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     private String title;
 
@@ -66,6 +69,7 @@ public class Movie {
             this.directors.remove(director);
         }
     }
+
 
 
 
