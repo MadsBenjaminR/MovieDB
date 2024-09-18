@@ -37,13 +37,13 @@ public class Movie {
     private double budget;
 
     // TODO - fix remove og add metoder
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private Set<Director> directors = new HashSet<>();
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private Set<Actor> actors = new HashSet<>();
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private Set<Genre> genres = new HashSet<>();
 
     public Movie(MovieDTO movieDTO) {
