@@ -35,6 +35,7 @@ public class Movie {
     private String language;
 
     private double budget;
+
     // TODO - fix remove og add metoder
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private Set<Director> directors = new HashSet<>();
@@ -54,6 +55,8 @@ public class Movie {
         this.budget = movieDTO.getBudget();
 
     }
+
+
 
 
     public void addActor(Actor actor) {

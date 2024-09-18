@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Purpose:
@@ -19,7 +20,13 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MovieApiResponseDTO {
     @JsonProperty("results")
-    private List<MovieDTO> movie_results;
+    private Set<MovieDTO> movieResults;
+
+    @JsonProperty("cast")
+    private Set<ActorDTO> listOfActorsDTO;
+    @JsonProperty("crew")
+    private Set<DirectorDTO> listOfDirectorsDTO;
+
 
 }
 

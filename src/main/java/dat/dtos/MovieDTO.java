@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MovieDTO {
+
     @JsonProperty("id")
     private Long id;
 
@@ -51,7 +52,7 @@ public class MovieDTO {
         this.title = movie.getTitle();
         this.description = movie.getDescription();
         this.rating = movie.getRating();
-        this.language = movie.getLanguage().toString();
+        this.language = movie.getLanguage();
         this.budget = movie.getBudget();
 
     }
