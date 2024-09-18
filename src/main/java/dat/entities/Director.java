@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -21,12 +23,17 @@ public class Director {
     private String lastName;
     private String fullName;
 
-    @ManyToOne
-    private Movie movie;
+    @ManyToMany
+    @JoinTable(
+            name = "movie_director", // The name of the join table
+            joinColumns = @JoinColumn(name = "movie_id"), // Foreign key for Movie
+            inverseJoinColumns = @JoinColumn(name = "director_id") // Foreign key for Actor
+    )
+    private Set<Movie> movie = new HashSet<>();
 
 
 
-    public Director(String firstName, String lastName, Movie movie) {
+    public Director(String firstName, String lastName, Set<Movie> movie) {
         this.firstName = firstName;
         this.lastName = lastName;
         fullName = firstName + " "+ lastName;

@@ -3,7 +3,9 @@ package dat.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,13 +23,18 @@ public class Actor {
     private String lastName;
     private String fullName;
 
-    @ManyToOne
-    private Movie movie;
+    @ManyToMany
+    @JoinTable(
+    name = "movie_actor", // The name of the join table
+    joinColumns = @JoinColumn(name = "movie_id"), // Foreign key for Movie
+    inverseJoinColumns = @JoinColumn(name = "actor_id") // Foreign key for Actor
+    )
+    private Set<Movie> movie = new HashSet<>();
 
-    public Actor(String firstName, String lastName, Movie movie) {
+    public Actor(String firstName, String lastName, Set<Movie> movie) {
         this.firstName = firstName;
         this.lastName = lastName;
-        fullName = firstName + " "+ lastName;
+        fullName = firstName + " " + lastName;
         this.movie = movie;
     }
 }
