@@ -1,6 +1,5 @@
 package dat.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dat.dtos.MovieApiResponseDTO;
 import dat.dtos.MovieDTO;
@@ -14,12 +13,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MovieService {
 
@@ -33,7 +28,6 @@ public class MovieService {
         if (apiKey == null || apiKey.isEmpty()) {
             System.err.println("API key is not set.");
         }
-
 
         try {
             String encodedMovieTitle = URLEncoder.encode(movieName, StandardCharsets.UTF_8);
@@ -50,7 +44,7 @@ public class MovieService {
             if (response.statusCode() == 200) {
                 String jsonResponse = response.body();
                 MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
-                movies = apiResponse.getMovie_results();
+                movies = apiResponse.getMovies();
 
                 if (movies != null && !movies.isEmpty()) {
                     movies.forEach(movie -> System.out.println("Movie: " + movie));
@@ -102,6 +96,7 @@ public class MovieService {
         return null;
     }
 
+    /*
     // Method to fetch movies between a specified rating range (e.g., 8.5 to 9.0)
     public List<MovieDTO> getMoviesByRatingRange(double minRating, double maxRating) {
         List<MovieDTO> movies = new ArrayList<>();
@@ -133,7 +128,7 @@ public class MovieService {
                 if (response.statusCode() == 200) {
                     String jsonResponse = response.body();
                     MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
-                    movies = apiResponse.getMovie_results();
+                    movies = apiResponse.getMovies();
                     if (currentPage >= totalNumberOfPages) {
                         morePagesAvailable = false;
                     } else {
@@ -159,7 +154,6 @@ public class MovieService {
         return movies;
     }
 
-    /*
     public List<MovieDTO> getSortedByReleaseDate(String query) {
         try {
             // Construct the search query URL
@@ -184,7 +178,7 @@ public class MovieService {
                 MovieApiResponseDTO apiResponse = mapper.readValue(response.body(), MovieApiResponseDTO.class);
 
                 // Get the list of movies
-                List<MovieDTO> movies = apiResponse.getMovie_results();
+                List<MovieDTO> movies = apiResponse.getMovies();
 
                 // Sort movies by release date in descending order using Java Streams
                 return movies.stream()
