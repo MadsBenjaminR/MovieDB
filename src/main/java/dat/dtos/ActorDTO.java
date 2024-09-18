@@ -19,10 +19,13 @@ public class ActorDTO {
 
     @JsonProperty("id")
     private Long id;
+
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("cast")
-    private List<CastDTO> cast;
+    @JsonProperty("character")
+    private String character;
+
+
 
 }

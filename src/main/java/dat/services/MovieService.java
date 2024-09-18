@@ -1,11 +1,14 @@
 package dat.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import dat.dtos.ActorDTO;
+import dat.dtos.DirectorDTO;
 import dat.dtos.MovieApiResponseDTO;
 import dat.dtos.MovieDTO;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,11 +17,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MovieService {
@@ -28,12 +29,11 @@ public class MovieService {
     private final ObjectMapper mapper = new ObjectMapper();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public List<MovieDTO> getMoviesByName(String movieName) {
-        List<MovieDTO> movies = null;
+    public Set<MovieDTO> getMoviesByName(String movieName) {
+        Set<MovieDTO> movies = null;
         if (apiKey == null || apiKey.isEmpty()) {
             System.err.println("API key is not set.");
         }
-
 
         try {
             String encodedMovieTitle = URLEncoder.encode(movieName, StandardCharsets.UTF_8);
@@ -50,7 +50,7 @@ public class MovieService {
             if (response.statusCode() == 200) {
                 String jsonResponse = response.body();
                 MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
-                movies = apiResponse.getMovie_results();
+                movies = apiResponse.getMovieResults();
 
                 if (movies != null && !movies.isEmpty()) {
                     movies.forEach(movie -> System.out.println("Movie: " + movie));
@@ -102,6 +102,254 @@ public class MovieService {
         return null;
     }
 
+    public Set<MovieDTO> getMovies(int totalNumberOfPages){
+        Set<MovieDTO> movieDTOS = new HashSet<>();
+
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.err.println("API key is not set.");
+            return movieDTOS;
+        }
+        int currentPage = 1;
+        boolean morePagesAvailable = true;
+
+        while (morePagesAvailable) {
+            try {
+
+                String url = "https://api.themoviedb.org/"+totalNumberOfPages+"/discover/movie?api_key=" + apiKey +
+                        "&include_adult=false&include_video=false&language=en-US&page=" + currentPage +
+                        "&primary_release_date.gte=2000-01-01&sort_by=popularity.desc&with_original_language=en";
+
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI(url))
+                        .GET()
+                        .header("accept", "application/json")
+                        .build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200) {
+                    String jsonResponse = response.body();
+                    MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
+                    movieDTOS = apiResponse.getMovieResults();
+
+                    //for(int i =0;i<movieDTOS.size();i++){
+                        for (MovieDTO movieDTO: movieDTOS){
+
+
+
+                        MovieApiResponseDTO credits=getCredits(movieDTO.getId());
+                        Set<ActorDTO> actors = credits.getListOfActorsDTO();
+                        Set<DirectorDTO> directors = credits.getListOfDirectorsDTO().stream()
+                                .filter(crew -> "Director".equalsIgnoreCase(crew.getJob()))
+                                .collect(Collectors.toSet());
+
+                        movieDTO.setActors(actors);
+                        movieDTO.setDirectors(directors);
+
+
+                        // Add the movie with actors and di
+                        // Process the lists of actors and directors as needed
+                        //actors.forEach(actor -> System.out.println("Actor: " + actor.getName() + " as " + actor.getCharacter()));
+                        //directors.forEach(director -> System.out.println("Director: " + director.getName()));
+
+
+
+                    }
+
+                    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                    File jsonfile=new File("movies.json");
+                    mapper.writeValue(jsonfile,movieDTOS);
+
+                    //TODO: metodekald efter vi har fået en liste med film, lav en metode til at få
+                    //fat i alle actor/director, cast via api-kald. derefter tilføjes hver enkelt actor/director til hver deres
+                    //list
+
+                    if (currentPage >= totalNumberOfPages) {
+                        morePagesAvailable = false;
+                    } else {
+                        currentPage++;
+                    }
+                } else {
+                    System.err.println("GET request failed. Status code: " + response.statusCode());
+                    morePagesAvailable = false;
+                }
+            } catch (URISyntaxException | IOException | InterruptedException e) {
+                System.err.println("Error during API request: " + e.getMessage());
+                e.printStackTrace();
+                morePagesAvailable = false;
+            }
+        }
+
+        if (movieDTOS.isEmpty()) {
+            System.out.println("No movies found in the specified rating range.");
+        } else {
+            movieDTOS.forEach(movie -> System.out.println("Movie: " + movie));
+        }
+
+        return movieDTOS;
+
+
+    }
+    private MovieApiResponseDTO getCredits(Long id) {
+        MovieApiResponseDTO credits = new MovieApiResponseDTO();
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.err.println("API key is not set.");
+            return credits;
+        }
+
+        try {
+            String url = "https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=" + apiKey + "&language=en-US";
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .GET()
+                    .header("accept", "application/json")
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                String jsonResponse = response.body();
+
+                // Map the response to MovieCreditsApiResponseDTO
+                credits = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
+
+            } else {
+                System.err.println("GET request failed. Status code: " + response.statusCode());
+            }
+
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            System.err.println("Error during API request: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return credits;
+    }
+/*
+    private List<DirectorDTO> getDirectors (Long id) {
+        List<DirectorDTO> listOfDirectors = new ArrayList<>();
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.err.println("API key is not set.");
+            return listOfDirectors;
+        }
+        int currentPage = 1;
+        boolean morePagesAvailable = true;
+
+        while (morePagesAvailable) {
+            try {
+
+                String url = "https://api.themoviedb.org/3/movie/"+ id +"/credits?language=en-US";
+
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI(url))
+                        .GET()
+                        .header("accept", "application/json")
+                        .build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200) {
+                    String jsonResponse = response.body();
+                    MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
+                    listOfActorsDTO = apiResponse.getListOfActorsDTO();
+
+                    //  mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                    //  File jsonfile=new File("movies.json");
+                    //  mapper.writeValue(jsonfile,movieDTOS);
+
+                    //TODO: metodekald efter vi har fået en liste med film, lav en metode til at få
+                    //fat i alle actor/director, cast via api-kald. derefter tilføjes hver enkelt actor/director til hver deres
+                    //list
+
+
+                } else {
+                    System.err.println("GET request failed. Status code: " + response.statusCode());
+                    morePagesAvailable = false;
+                }
+            } catch (URISyntaxException | IOException | InterruptedException e) {
+                System.err.println("Error during API request: " + e.getMessage());
+                e.printStackTrace();
+                morePagesAvailable = false;
+            }
+        }
+
+        if (listOfActorsDTO.isEmpty()) {
+            System.out.println("No movies found in the specified rating range.");
+        } else {
+            listOfActorsDTO.forEach(movie -> System.out.println("Movie: " + movie));
+        }
+
+        return listOfActorsDTO;
+
+    }
+
+ */
+
+    public Set<ActorDTO> getActors(Long id){
+        Set<ActorDTO> listOfActorsDTO = new HashSet<>();
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.err.println("API key is not set.");
+            return listOfActorsDTO;
+        }
+        int currentPage = 1;
+        boolean morePagesAvailable = true;
+
+        while (morePagesAvailable) {
+            try {
+
+                String url = "https://api.themoviedb.org/3/movie/"+ id +"/credits?language=en-US";
+
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI(url))
+                        .GET()
+                        .header("accept", "application/json")
+                        .build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200) {
+                    String jsonResponse = response.body();
+                    MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
+                    listOfActorsDTO = apiResponse.getListOfActorsDTO();
+
+                    //  mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                    //  File jsonfile=new File("movies.json");
+                    //  mapper.writeValue(jsonfile,movieDTOS);
+
+                    //TODO: metodekald efter vi har fået en liste med film, lav en metode til at få
+                    //fat i alle actor/director, cast via api-kald. derefter tilføjes hver enkelt actor/director til hver deres
+                    //list
+
+
+                } else {
+                    System.err.println("GET request failed. Status code: " + response.statusCode());
+                    morePagesAvailable = false;
+                }
+            } catch (URISyntaxException | IOException | InterruptedException e) {
+                System.err.println("Error during API request: " + e.getMessage());
+                e.printStackTrace();
+                morePagesAvailable = false;
+            }
+        }
+
+        if (listOfActorsDTO.isEmpty()) {
+            System.out.println("No movies found in the specified rating range.");
+        } else {
+            listOfActorsDTO.forEach(movie -> System.out.println("Movie: " + movie));
+        }
+
+        return listOfActorsDTO;
+
+
+    }
+
+
+    /*
+
+
     // Method to fetch movies between a specified rating range (e.g., 8.5 to 9.0)
     public List<MovieDTO> getMoviesByRatingRange(double minRating, double maxRating) {
         List<MovieDTO> movies = new ArrayList<>();
@@ -133,7 +381,7 @@ public class MovieService {
                 if (response.statusCode() == 200) {
                     String jsonResponse = response.body();
                     MovieApiResponseDTO apiResponse = mapper.readValue(jsonResponse, MovieApiResponseDTO.class);
-                    movies = apiResponse.getMovie_results();
+                    movies = apiResponse.getMovies();
                     if (currentPage >= totalNumberOfPages) {
                         morePagesAvailable = false;
                     } else {
@@ -159,7 +407,6 @@ public class MovieService {
         return movies;
     }
 
-    /*
     public List<MovieDTO> getSortedByReleaseDate(String query) {
         try {
             // Construct the search query URL
@@ -184,7 +431,7 @@ public class MovieService {
                 MovieApiResponseDTO apiResponse = mapper.readValue(response.body(), MovieApiResponseDTO.class);
 
                 // Get the list of movies
-                List<MovieDTO> movies = apiResponse.getMovie_results();
+                List<MovieDTO> movies = apiResponse.getMovies();
 
                 // Sort movies by release date in descending order using Java Streams
                 return movies.stream()

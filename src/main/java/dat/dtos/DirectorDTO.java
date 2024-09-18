@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,10 +19,7 @@ public class DirectorDTO {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("crew")
-    private List<CrewDTO> crew;
+    @JsonProperty("job")
+    private String job;
 
-    public DirectorDTO(String name) {
-        this.name = name;
     }
-}

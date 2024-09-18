@@ -15,9 +15,9 @@ public class Main {
 
         MovieService movieService = new MovieService();
 
-        List<MovieDTO> movies = movieService.getMoviesByName("The Dark Knight");
-        MovieDAO movieDAO = new MovieDAO();
+        //List<MovieDTO> movies = movieService.getMoviesByName("The Dark Knight");
 
-        movieDAO.create(movies.get(0));
+
+        movieService.getMovies(3);
     }
 }
