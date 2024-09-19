@@ -11,6 +11,7 @@ import dat.entities.Genre;
 import dat.entities.Movie;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,51 +27,140 @@ public class MovieDAO {
 
 
 
-    public MovieDTO create(MovieDTO movieDTO) {
-        Movie movie = new Movie(movieDTO);
-        try (EntityManager em = emf.createEntityManager()) {
-       em.getTransaction().begin();
-            Set<Director> directors = new HashSet<>();
-            for (DirectorDTO directorDTO : movieDTO.getDirectors()) {
-                Director director = em.find(Director.class, directorDTO.getId());
-                if (director != null) {
-                    directors.add(director);
-                }else {
-                    em.persist(movie);
-                }
-            }
-            movie.setDirectors(directors);
+    public void create(Set<MovieDTO> movieDTOs) {
+        EntityManager em = null;
+        EntityTransaction transaction = null;
 
-            // Handle Actors (Set<Actor>)
-            Set<Actor> actors = new HashSet<>();
-            for (ActorDTO actorDTO : movieDTO.getActors()) {
-                Actor actor = em.find(Actor.class, actorDTO.getId());
-                if (actor != null) {
-                    actors.add(actor);
-                }else {
-                    em.persist(actor);
-                }
-            }
-            movie.setActors(actors);
+        try {
+            em = emf.createEntityManager();
+            transaction = em.getTransaction();
+            transaction.begin();
 
-            // Handle Genres (Set<Genre>)
-            Set<Genre> genres = new HashSet<>();
-            for (GenreDTO genreDTO : movieDTO.getGenres()) {
-                Genre genre = em.find(Genre.class, genreDTO.getId());
-                if (genre != null) {
-                    genres.add(genre);
-                } else {
-                    em.persist(genre);
+            for (MovieDTO movieDTO : movieDTOs) {
+                if (movieDTO == null) {
+                    System.err.println("Skipping null MovieDTO");
+                    continue;
                 }
-            }
-            movie.setGenres(genres);
 
-            em.persist(movie);
-            em.getTransaction().commit();
+                Movie movie = new Movie(movieDTO);
+                em.persist(movie);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
     }
-        return new MovieDTO(movie);
+    public Set<MovieDTO> establishRelationships(Set<MovieDTO> movieDTOs) {
+        EntityManager em = null;
+        EntityTransaction transaction = null;
+
+        try {
+            em = emf.createEntityManager();
+            transaction = em.getTransaction();
+            transaction.begin();
+
+            for (MovieDTO movieDTO : movieDTOs) {
+                if (movieDTO == null) {
+                    System.err.println("Skipping null MovieDTO");
+                    continue;
+                }
+
+                // Find the movie in the database
+                Movie movie = em.find(Movie.class, movieDTO.getId());
+                if (movie == null) {
+                    System.err.println("Movie not found for ID: " + movieDTO.getId());
+                    continue;
+                }
+
+                // Handle Directors
+                Set<Director> directors = getOrCreateDirectors(em, movieDTO.getDirectors());
+                movie.setDirectors(directors);
+
+                // Handle Actors
+                Set<Actor> actors = getOrCreateActors(em, movieDTO.getActors());
+                movie.setActors(actors);
+
+                // Handle Genres
+                Set<Genre> genres = getOrCreateGenres(em, movieDTO.getGenres());
+                movie.setGenres(genres);
+
+                // Merge the updated movie entity
+                em.merge(movie);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
+        return movieDTOs;
     }
 
+    private Set<Director> getOrCreateDirectors(EntityManager em, Set<DirectorDTO> directorDTOs) {
+        Set<Director> directors = new HashSet<>();
+        if (directorDTOs != null) {
+            for (DirectorDTO dto : directorDTOs) {
+                Director director = em.find(Director.class, dto.getId());
+                if (director == null) {
+                    director = new Director();
+                    director.setId(dto.getId());
+                    director.setFullName(dto.getName());
+                    director.setJob(dto.getJob());
+                    em.merge(director);
+                }
+                directors.add(director);
+            }
+        }
+        return directors;
+    }
+
+    private Set<Actor> getOrCreateActors(EntityManager em, Set<ActorDTO> actorDTOs) {
+        Set<Actor> actors = new HashSet<>();
+        if (actorDTOs != null) {
+            for (ActorDTO dto : actorDTOs) {
+                Actor actor = em.find(Actor.class, dto.getId());
+                if (actor == null) {
+                    actor = new Actor();
+                    actor.setId(dto.getId());
+                    actor.setFullName(dto.getName());
+                    em.merge(actor);
+                }
+                actors.add(actor);
+            }
+        }
+        return actors;
+    }
+
+    private Set<Genre> getOrCreateGenres(EntityManager em, Set<GenreDTO> genreDTOs) {
+        Set<Genre> genres = new HashSet<>();
+        if (genreDTOs != null) {
+            for (GenreDTO dto : genreDTOs) {
+                Genre genre = em.find(Genre.class, dto.getId());
+                if (genre == null) {
+                    genre = new Genre();
+                    genre.setId((long) dto.getId());
+                    genre.setName(dto.getName());
+                    em.merge(genre);
+                }
+                genres.add(genre);
+            }
+        }
+        return genres;
+    }
     // TODO: ret til når dto er lavet
     /*
     @Override
@@ -160,4 +250,5 @@ public class MovieDAO {
     }
 
      */
+
 }

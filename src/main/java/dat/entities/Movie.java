@@ -21,29 +21,40 @@ import java.util.stream.Collectors;
 
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 1000)
     private String title;
 
+    @Column(length = 1000)
     private String description;
 
     private double rating;
-
-    private double runtime;
-
     private String language;
-
     private double budget;
 
-    // TODO - fix remove og add metoder
-    @ManyToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "movie_director",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "director_id")
+    )
     private Set<Director> directors = new HashSet<>();
 
-    @ManyToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "movie_actor",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "actor_id")
+    )
     private Set<Actor> actors = new HashSet<>();
 
-    @ManyToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "movie_genre",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
     private Set<Genre> genres = new HashSet<>();
 
     public Movie(MovieDTO movieDTO) {
@@ -55,41 +66,4 @@ public class Movie {
         this.budget = movieDTO.getBudget();
 
     }
-
-
-
-
-    public void addActor(Actor actor) {
-       actor = new Actor(actor.getFirstName(), actor.getLastName(), actor.getMovie());
-        if (actor != null) {
-            this.actors.add(actor);
-        }
-    }
-
-    public void addDirector(Director director) {
-        director = new Director(director.getFirstName(), director.getLastName(), director.getMovie());
-        if (director != null) {
-            this.directors.add(director);
-        }
-    }
-
-    public void removeActor(Actor actor) {
-        if (actor == null) {
-            this.actors.remove(actor);
-        }
-    }
-
-    public void removeDirector(Director director) {
-        if (director != null) {
-            this.directors.remove(director);
-        }
-    }
-
-
-
-
-
-
-
-
 }

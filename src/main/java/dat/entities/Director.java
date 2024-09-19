@@ -15,30 +15,24 @@ import java.util.Set;
 @Entity
 public class Director {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     private String firstName;
     private String lastName;
     private String fullName;
+    private String job;
 
-    @ManyToMany
-    @JoinTable(
-            name = "movie_director", // The name of the join table
-            joinColumns = @JoinColumn(name = "movie_id"), // Foreign key for Movie
-            inverseJoinColumns = @JoinColumn(name = "director_id") // Foreign key for Actor
-    )
-    private Set<Movie> movie = new HashSet<>();
+    @ManyToMany(mappedBy = "directors")
+    private Set<Movie> movies = new HashSet<>();
 
 
 
-    public Director(String firstName, String lastName, Set<Movie> movie) {
+    public Director(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
         fullName = firstName + " "+ lastName;
-        this.movie = movie;
+
 
     }
-
 }

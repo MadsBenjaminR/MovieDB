@@ -6,9 +6,12 @@ import dat.entities.Actor;
 import dat.entities.Director;
 import dat.entities.Genre;
 import dat.entities.Movie;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +29,8 @@ public class MovieDTO {
     @JsonProperty("title")
     private String title;
 
-    @JsonProperty("description")  // Add this to match the Movie entity
+    @JsonProperty("overview")// Add this to match the Movie entity
+    @Column(name = "description")
     private String description;
 
     @JsonProperty("vote_average")
@@ -42,11 +46,11 @@ public class MovieDTO {
 
     @JsonProperty("actors")
     private Set<ActorDTO> actors = new HashSet<>();
+    @JsonProperty("genre_ids")
+    private List<Integer> genre_ids; // This will store genre IDs from the API response
+    private Set<GenreDTO> genres;
 
-    @JsonProperty("genres")
-    private Set<GenreDTO> genres = new HashSet<>();
 
-    // Constructor to convert from Movie entity to MovieDTO
     public MovieDTO(Movie movie) {
         this.id = movie.getId();
         this.title = movie.getTitle();

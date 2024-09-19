@@ -16,20 +16,17 @@ import java.util.Set;
 public class Genre {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     private String name;
 
-    @ManyToMany
-    @JoinTable(
-            name = "movie_genre", // The name of the join table
-            joinColumns = @JoinColumn(name = "movie_id"), // Foreign key for Movie
-            inverseJoinColumns = @JoinColumn(name = "genre_id") // Foreign key for Actor
-    )
-    private Set<Movie> movie = new HashSet<>();
+    @ManyToMany(mappedBy = "genres")
+    private Set<Movie> movies = new HashSet<>();
 
+    public Genre(String name,Movie movie) {
+        this.name = name;
+        movies.add(movie);
 
-
+    }
 }

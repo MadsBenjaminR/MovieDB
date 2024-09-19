@@ -15,13 +15,13 @@ import java.util.Set;
 @Entity
 public class Actor {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     private String firstName;
     private String lastName;
     private String fullName;
+
 
     @ManyToMany
     @JoinTable(
@@ -31,11 +31,13 @@ public class Actor {
     )
     private Set<Movie> movie = new HashSet<>();
 
+
     public Actor(String firstName, String lastName, Set<Movie> movie) {
         this.firstName = firstName;
         this.lastName = lastName;
-        fullName = firstName + " " + lastName;
-        this.movie = movie;
+
+        fullName = firstName + " "+ lastName;
+        movies.add(movie);
     }
 }
 
