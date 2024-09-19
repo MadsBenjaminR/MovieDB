@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class GenreDTO {
 
     @JsonProperty("id")
-    private Long id;
+    private int id;
     @JsonProperty("name")
     private String name;
 

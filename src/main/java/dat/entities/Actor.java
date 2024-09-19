@@ -3,7 +3,9 @@ package dat.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -13,7 +15,6 @@ import java.util.List;
 @Entity
 public class Actor {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -21,14 +22,15 @@ public class Actor {
     private String lastName;
     private String fullName;
 
-    @ManyToOne
-    private Movie movie;
+    @ManyToMany(mappedBy = "actors")
+    private Set<Movie> movies = new HashSet<>();
 
     public Actor(String firstName, String lastName, Movie movie) {
         this.firstName = firstName;
         this.lastName = lastName;
         fullName = firstName + " "+ lastName;
-        this.movie = movie;
+        movies.add(movie);
+
     }
 }
 

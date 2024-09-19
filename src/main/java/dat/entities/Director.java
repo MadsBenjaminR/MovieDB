@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -13,25 +15,24 @@ import java.util.List;
 @Entity
 public class Director {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     private String firstName;
     private String lastName;
     private String fullName;
+    private String job;
 
-    @ManyToOne
-    private Movie movie;
+    @ManyToMany(mappedBy = "directors")
+    private Set<Movie> movies = new HashSet<>();
 
 
 
-    public Director(String firstName, String lastName, Movie movie) {
+    public Director(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
         fullName = firstName + " "+ lastName;
-        this.movie = movie;
+
 
     }
-
 }
