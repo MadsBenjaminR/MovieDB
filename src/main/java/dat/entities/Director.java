@@ -18,8 +18,6 @@ public class Director {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private String firstName;
-    private String lastName;
     private String fullName;
     private String job;
 
@@ -28,11 +26,7 @@ public class Director {
 
 
 
-    public Director(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        fullName = firstName + " "+ lastName;
-
-
+    public Director(String fullName) {
+        this.fullName = fullName;
     }
 }
