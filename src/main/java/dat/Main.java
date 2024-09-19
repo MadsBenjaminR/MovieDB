@@ -18,11 +18,11 @@ public class Main {
         MovieDTO movieDTO = new MovieDTO();
         MovieDAO movieDAO = new MovieDAO();
 
-        Set<MovieDTO> movieDTOS = movieService.getMovies(5);
+        Set<MovieDTO> movieDTOS = movieService.getMovies(15);
 
 
         movieDAO.create(movieDTOS);
-        Set<MovieDTO> movieDTO1=movieDAO.establishRelationships(movieDTOS);
+        movieDAO.establishRelationships(movieDTOS);
 
 
     }

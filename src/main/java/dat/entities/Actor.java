@@ -18,8 +18,7 @@ public class Actor {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private String firstName;
-    private String lastName;
+
     private String fullName;
 
 
@@ -27,11 +26,8 @@ public class Actor {
     private Set<Movie> movies = new HashSet<>();
 
 
-    public Actor(String firstName, String lastName, Movie movie) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-
-        fullName = firstName + " "+ lastName;
+    public Actor(String fullName, Movie movie) {
+        this.fullName = fullName;
         movies.add(movie);
     }
 }
