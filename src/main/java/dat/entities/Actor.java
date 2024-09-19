@@ -22,15 +22,22 @@ public class Actor {
     private String lastName;
     private String fullName;
 
-    @ManyToMany(mappedBy = "actors")
-    private Set<Movie> movies = new HashSet<>();
 
-    public Actor(String firstName, String lastName, Movie movie) {
+    @ManyToMany
+    @JoinTable(
+    name = "movie_actor", // The name of the join table
+    joinColumns = @JoinColumn(name = "movie_id"), // Foreign key for Movie
+    inverseJoinColumns = @JoinColumn(name = "actor_id") // Foreign key for Actor
+    )
+    private Set<Movie> movie = new HashSet<>();
+
+
+    public Actor(String firstName, String lastName, Set<Movie> movie) {
         this.firstName = firstName;
         this.lastName = lastName;
+
         fullName = firstName + " "+ lastName;
         movies.add(movie);
-
     }
 }
 

@@ -29,7 +29,4 @@ public class Genre {
         movies.add(movie);
 
     }
-
-
-
 }

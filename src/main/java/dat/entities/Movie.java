@@ -30,7 +30,6 @@ public class Movie {
     private String description;
 
     private double rating;
-    private double runtime;
     private String language;
     private double budget;
 
