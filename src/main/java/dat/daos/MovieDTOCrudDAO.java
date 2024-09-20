@@ -2,24 +2,20 @@ package dat.daos;
 
 import dat.config.HibernateConfig;
 import dat.dtos.MovieDTO;
-import dat.entities.Director;
 import dat.entities.Movie;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author laith kaseb
  **/
 
 
-public class MovieCrudDAO {
+public class MovieDTOCrudDAO {
     EntityManagerFactory emf= HibernateConfig.getEntityManagerFactory("tmdb");
-    EntityManagerFactory emfTest=HibernateConfig.getEntityManagerFactoryForTest();
 
     public void delete(MovieDTO movieDTO) {
         try (EntityManager em = emf.createEntityManager()) {
@@ -57,17 +53,14 @@ public class MovieCrudDAO {
 
         // Set the generated ID back in the DTO
         movieDTO.setId(movie.getId());
-        return movieDTO;
+        return new MovieDTO(movie);
     } catch (Exception e) {
         em.getTransaction().rollback(); // Rollback the transaction if there's an error
         throw new RuntimeException("Error creating movie", e); // Optionally rethrow the exception
     } finally {
         em.close();
     }
-}
-
-
-
+    }
 
 
 
@@ -85,15 +78,12 @@ public class MovieCrudDAO {
         }
     }
 
-    public List<Movie> findAll() {
-        EntityManager em = emfTest.createEntityManager();
+    public List<MovieDTO> findAll() {
+        EntityManager em = emf.createEntityManager();
         try {
-            TypedQuery query =em.createQuery("SELECT m from movie m",Movie.class);
-
-            return query.getResultList();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            return em.createQuery("SELECT new dat.dtos.MovieDTO(m) FROM movie m", MovieDTO.class).getResultList();
+        } finally {
+            em.close();
         }
     }
 

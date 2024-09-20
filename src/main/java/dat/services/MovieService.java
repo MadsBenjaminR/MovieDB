@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
 
 public class MovieService {
 
-    private final String apiKey = System.getenv("API_KEY");
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private Map<Integer, GenreDTO> genreDTOs; // Declare genreDTOs here
+    private static final  String apiKey = System.getenv("API_KEY");
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static Map<Integer, GenreDTO> genreDTOs; // Declare genreDTOs here
 
 
-    public Set<MovieDTO> getMoviesByName(String movieName) {
+    public static Set<MovieDTO> getMoviesByName(String movieName) {
         Set<MovieDTO> movies = null;
         if (apiKey == null || apiKey.isEmpty()) {
             System.err.println("API key is not set.");
