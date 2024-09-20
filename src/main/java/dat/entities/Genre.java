@@ -24,7 +24,8 @@ public class Genre {
     @ManyToMany(mappedBy = "genres")
     private Set<Movie> movies = new HashSet<>();
 
-    public Genre(String name,Movie movie) {
+    public Genre(long id,String name,Movie movie) {
+        this.id = id;
         this.name = name;
         movies.add(movie);
 

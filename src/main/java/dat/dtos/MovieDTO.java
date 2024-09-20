@@ -60,4 +60,5 @@ public class MovieDTO {
         this.budget = movie.getBudget();
 
     }
+
 }

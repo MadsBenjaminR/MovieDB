@@ -26,7 +26,8 @@ public class Director {
 
 
 
-    public Director(String fullName) {
+    public Director(long id,String fullName) {
+        this.id = id;
         this.fullName = fullName;
     }
 }

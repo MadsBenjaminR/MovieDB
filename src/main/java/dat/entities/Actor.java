@@ -26,7 +26,8 @@ public class Actor {
     private Set<Movie> movies = new HashSet<>();
 
 
-    public Actor(String fullName, Movie movie) {
+    public Actor(long id,String fullName, Movie movie) {
+        this.id=id;
         this.fullName = fullName;
         movies.add(movie);
     }
