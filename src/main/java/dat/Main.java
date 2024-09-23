@@ -6,20 +6,30 @@ import dat.dtos.MovieDTO;
 import dat.services.JsonService;
 import dat.services.MovieService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
 
         MovieService movieService = new MovieService();
-        MovieDTO movieDTO = new MovieDTO();
         MovieDAO movieDAO = new MovieDAO();
 
-        Set<MovieDTO> movieDTOS = movieService.getMovies(15);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String releaseDate = "2019-01-01";
+        //LocalDate releaseDate = dateFormat.parse("2019-01-01");
+
+       // Set<MovieDTO> movieDTOS = movieService.getMovies(15);
+        Set<MovieDTO> movieDTOS = movieService.getDanishMovieByAfterYear(releaseDate, 15);
 
         movieDAO.create(movieDTOS);
         movieDAO.establishRelationships(movieDTOS);

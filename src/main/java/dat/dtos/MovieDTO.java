@@ -10,6 +10,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +43,9 @@ public class MovieDTO {
     @JsonProperty("budget")
     private double budget;
 
+    @JsonProperty("release_date")
+    private String releaseDate;
+
     @JsonProperty("directors")
     private Set<DirectorDTO> directors = new HashSet<>();
 
@@ -58,7 +63,7 @@ public class MovieDTO {
         this.rating = movie.getRating();
         this.language = movie.getLanguage();
         this.budget = movie.getBudget();
-
+        this.releaseDate = movie.getReleaseDate();
     }
 
 }

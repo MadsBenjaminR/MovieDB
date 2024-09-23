@@ -5,7 +5,10 @@ import dat.dtos.DirectorDTO;
 import dat.dtos.MovieDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +36,9 @@ public class Movie {
     private double rating;
     private String language;
     private double budget;
+
+    @Column(name = "releasedate")
+    private String releaseDate;
 
     @ManyToMany
     @JoinTable(
@@ -65,6 +71,6 @@ public class Movie {
         this.rating = movieDTO.getRating();
         this.language = movieDTO.getLanguage();
         this.budget = movieDTO.getBudget();
-
+        this.releaseDate = movieDTO.getReleaseDate();
     }
 }
