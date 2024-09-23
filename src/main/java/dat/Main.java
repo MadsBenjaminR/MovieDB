@@ -17,16 +17,13 @@ import java.util.Set;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
 
         MovieService movieService = new MovieService();
         MovieDAO movieDAO = new MovieDAO();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String releaseDate = "2019-01-01";
-        //LocalDate releaseDate = dateFormat.parse("2019-01-01");
+        
 
        // Set<MovieDTO> movieDTOS = movieService.getMovies(15);
         Set<MovieDTO> movieDTOS = movieService.getDanishMovieByAfterYear(releaseDate, 15);
